@@ -9,11 +9,16 @@ import (
 	"time"
 )
 
+type Item struct {
+	Object     interface{}
+	Expiration *time.Time
+}
+
 type Tab interface {
 	Set(k string, x interface{}, d time.Duration)
-
 	Get(k string) (interface{}, bool)
 	DeleteExpired()
+	Items() map[string]*cache.Item
 }
 
 type tab struct {
@@ -36,6 +41,14 @@ func (t *tab) Get(k string) (interface{}, bool) {
 func (t *tab) DeleteExpired() {
 	t.cache.DeleteExpired()
 }
+
+// Items is the abstraction of cache.Items() which
+// returns all items in the cache including the potential of
+// expired items. Please see their documentation for more info.
+func (t *tab) Items() map[string]*cache.Item {
+	return t.cache.Items()
+}
+
 func NewTab(t *cache.Cache) martini.Handler {
 	return func(res http.ResponseWriter, req *http.Request, c martini.Context) {
 		c.MapTo(&tab{res, req, t}, (*Tab)(nil))
