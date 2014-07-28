@@ -19,6 +19,7 @@ type Tab interface {
 	Get(k string) (interface{}, bool)
 	DeleteExpired()
 	Items() map[string]*cache.Item
+	Flush()
 }
 
 type tab struct {
@@ -47,6 +48,12 @@ func (t *tab) DeleteExpired() {
 // expired items. Please see their documentation for more info.
 func (t *tab) Items() map[string]*cache.Item {
 	return t.cache.Items()
+}
+
+// Flush is the abstraction of cache.Flush() used
+// to delete all items from the cache
+func (t *tab) Flush() {
+	t.cache.Flush()
 }
 
 func NewTab(t *cache.Cache) martini.Handler {
