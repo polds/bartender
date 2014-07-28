@@ -13,6 +13,7 @@ type Tab interface {
 	Set(k string, x interface{}, d time.Duration)
 
 	Get(k string) (interface{}, bool)
+	DeleteExpired()
 }
 
 type tab struct {
@@ -29,6 +30,12 @@ func (t *tab) Get(k string) (interface{}, bool) {
 	return t.cache.Get(k)
 }
 
+// DeleteExpired is the abstraction of cache.DeleteExpired() used
+// to force a manual purge of already expired items in the cache
+// before the janitor gets to it.
+func (t *tab) DeleteExpired() {
+	t.cache.DeleteExpired()
+}
 func NewTab(t *cache.Cache) martini.Handler {
 	return func(res http.ResponseWriter, req *http.Request, c martini.Context) {
 		c.MapTo(&tab{res, req, t}, (*Tab)(nil))
