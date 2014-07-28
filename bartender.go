@@ -28,10 +28,12 @@ type tab struct {
 	cache          *cache.Cache
 }
 
+// Set is the abstraction of cache.Set() used to set an item
 func (t *tab) Set(k string, x interface{}, d time.Duration) {
 	t.cache.Set(k, x, d)
 }
 
+// Get is the abstraction of cache.Get() used to get an item from cache
 func (t *tab) Get(k string) (interface{}, bool) {
 	return t.cache.Get(k)
 }
@@ -56,12 +58,14 @@ func (t *tab) Flush() {
 	t.cache.Flush()
 }
 
+// NewTab creates the martini service
 func NewTab(t *cache.Cache) martini.Handler {
 	return func(res http.ResponseWriter, req *http.Request, c martini.Context) {
 		c.MapTo(&tab{res, req, t}, (*Tab)(nil))
 	}
 }
 
+// OpenTab instantiates a new cache object
 func OpenTab(defaultExpiration, cleanupInterval time.Duration) *cache.Cache {
 	return cache.New(defaultExpiration, cleanupInterval)
 }
